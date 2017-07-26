@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="tours-users">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `tours-users`
+     * interact with nearby users
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class ToursUsers extends Polymer.Element {
+      static get is() { return 'tours-users'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'tours-users'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(ToursUsers.is, ToursUsers);
+  </script>
+</dom-module>
