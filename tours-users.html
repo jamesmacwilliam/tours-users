@@ -4,28 +4,65 @@
       :host {
         display: block;
       }
+      [odd] {
+        background: rgba(0,0,0,0.05);
+      }
+      .item {
+        padding: 10px 15px;
+        position: relative;
+        font-family: Tahoma, Geneva, sans-serif;
+      }
+      .name {
+        font-weight: bold;
+      }
+      .link a {
+        color: #0c8ec8;
+        text-decoration: none;
+        cursor: pointer;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <template is="dom-repeat" items="[[users]]" >
+      <div class="item" odd$="[[isEven(index)]]">
+        <div class="name">
+          [[item.name]]
+        </div>
+        <div class="link">
+          <a href="[[item.email]]">[[item.email]]</a>
+        </div>
+      </div>
+    </template>
   </template>
-
   <script>
-    /**
-     * `tours-users`
-     * interact with nearby users
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
     class ToursUsers extends Polymer.Element {
       static get is() { return 'tours-users'; }
       static get properties() {
         return {
-          prop1: {
-            type: String,
-            value: 'tours-users'
+          users: {
+            type: Array,
+            value: []
           }
         };
+      }
+      ready() {
+        super.ready();
+        this.updateUsers();
+      }
+      updateUsers() {
+        let xhr = new XMLHttpRequest();
+        let _this = this;
+        xhr.open('GET', '/api/users');
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4 && xhr.status == 200) {
+            _this.setUsers.apply(_this, [xhr.responseText])
+          }
+        };
+      }
+      setUsers(json) {
+        this.set('users', JSON.parse(json).users);
+      }
+      isEven(index) {
+        return (index % 2) === 0;
       }
     }
 
