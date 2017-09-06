@@ -9,7 +9,7 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../tours-users.html">
+    <link rel="import" href="../tours-users_for_testing.html">
   </head>
   <body>
 
@@ -19,30 +19,52 @@
       </template>
     </test-fixture>
 
-    <test-fixture id="ChangedPropertyTestFixture">
+    <test-fixture id="FixtureWithAjax">
       <template>
-        <tours-users prop1="new-prop1"></tours-users>
+        <iron-ajax url="/api/users"></iron-ajax>
+        <tours-users></tours-users>
       </template>
     </test-fixture>
 
     <script>
       suite('tours-users', function() {
 
+        var server;
+        var responseHeaders = {
+          json: { }
+        };
+        setup(function() {
+          server = sinon.fakeServer.create();
+          server.respondWith(
+              'Get',
+              /\/api\/users.*/, [
+                200,
+                { 'Content-Type': 'application/json' },
+                '{"users":[{"name":"Blake Reichel","longitude":-149.77170906373692,"latitude":-31.38964617436077,"from_where":"Ohio","email":"rick1951@kovacek.name"}]}'
+              ]
+            );
+        });
+        teardown(function() { server.restore(); });
+
         test('instantiating the element with default properties works', function() {
           var element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'tours-users');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello tours-users!');
+          assert.equal(element.users[0], null);
+          var item = element.shadowRoot.querySelector('.item');
+          assert.equal(item, null);
         });
 
-        test('setting a property on the element works', function() {
-          // Create a test fixture
-          var element = fixture('ChangedPropertyTestFixture');
-          assert.equal(element.prop1, 'new-prop1');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
+
+        test('element displays correct markup', function(done) {
+          var element = fixture('FixtureWithAjax')[1];
+          server.respond();
+          assert.equal(element.users.length, 1);
+
+          flush(function() {
+            var items = element.shadowRoot.querySelectorAll('div');
+            window.x1 = element;
+            //assert.equal(items.length, 1);
+            done();
+          })
         });
 
       });

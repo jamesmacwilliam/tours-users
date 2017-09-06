@@ -21,7 +21,8 @@
         cursor: pointer;
       }
     </style>
-    <template is="dom-repeat" items="[[users]]" >
+    <foo class="bar">[[foo.email]]</foo>
+    <template id='foo' is="dom-repeat" items="[[users]]" >
       <div class="item" odd$="[[isEven(index)]]">
         <div class="name">
           [[item.name]]
@@ -60,6 +61,7 @@
       }
       setUsers(json) {
         this.set('users', JSON.parse(json).users);
+        this.set('foo', this.users[0]);
       }
       isEven(index) {
         return (index % 2) === 0;
